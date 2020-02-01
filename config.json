@@ -1,0 +1,20 @@
+{
+    "numberOfFilesInSample": 1500,
+    "epochs": 100,
+    "rangeOfNumberOfHiddenLayersMin": 1,
+    "rangeOfNumberOfHiddenLayersMax": 6,
+    "trainSplit": 0.8,
+    "C2D": true,
+    "RGB": true,
+    "ImageWidth": 250,
+    "ImageHeight": 250,
+    "RGBDimentions": 3,
+    "ConvNodesOne": 32,
+    "ConvNodesTwo": 64,
+    "ConvOutputDim": 3,
+    "DenseNodes": 128,
+    "Dropout": 0.2,
+    "OutputNodes": 1,
+    "PoolSize": 2,
+    "PixelMaxValues": 255
+}
