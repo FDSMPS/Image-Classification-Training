@@ -9,10 +9,29 @@ from os.path import join
 from PIL import Image
 from random import sample
 
+'''
+It trains the machine learning model on our images
+@author Jessica D'Cunha
+@date 2020-1-31
+Project: ECE 492 Group 1
+'''
+
+'''
+To display image
+@param img_array
+@return img
+'''
 def display_image(img_array):
     img = Image.fromarray(img_array, 'L')
     return img
 
+'''
+load images based on whether they are colored
+@param base
+@param numberOfFilesInSample
+@param RGB
+@return images
+'''
 def load_images(base, numberOfFilesInSample, RGB):
     files = sample([f for f in listdir(base)], numberOfFilesInSample)
     if RGB:
@@ -20,17 +39,37 @@ def load_images(base, numberOfFilesInSample, RGB):
     else:
         images = np.array([np.array(Image.open(join(base,fname)).convert('L')) for fname in files])
     return images
-
+'''
+load all images both faces and non faces
+@param faceBase
+@param nonFaceBase
+@param numberOfFilesInSample
+@param RGB
+@return nonFaceImages
+@return faceImages
+'''
 def load_all_images(faceBase, nonFaceBase, numberOfFilesInSample, RGB):
     faceImages = load_images(faceBase, numberOfFilesInSample, RGB)
     nonFaceImages = load_images(nonFaceBase, numberOfFilesInSample, RGB)
     return faceImages, nonFaceImages
 
-
+'''
+normalize images
+@param images
+@param nonFaceBase
+@return normalized images
+'''
 def normalize_images(images):
     return images / 255
 
-
+'''
+get the labeled images that are faces or non faces
+@param faceBase
+@param nonFaceBase
+@param numberOfFilesInSample
+@return RGB
+@return labeled data
+'''
 def get_labeled_data(numberOfFilesInSample, faceBase, nonFaceBase, RGB):
     faceImages, nonFaceImages = load_all_images(faceBase, nonFaceBase, numberOfFilesInSample, RGB)
 
@@ -44,7 +83,16 @@ def get_labeled_data(numberOfFilesInSample, faceBase, nonFaceBase, RGB):
     np.random.shuffle(labeledData)
 
     return labeledData
-
+'''
+get train validation data
+@param faceBase
+@param nonFaceBase
+@param numberOfFilesInSample
+@param trainSplit
+@return RGB
+@return trainingData
+@return validationData
+'''
 def get_train_validation_data(numberOfFilesInSample, faceBase, nonFaceBase, trainSplit, RGB):
     labeledData = get_labeled_data(numberOfFilesInSample, faceBase, nonFaceBase, RGB)
 
@@ -54,7 +102,11 @@ def get_train_validation_data(numberOfFilesInSample, faceBase, nonFaceBase, trai
     validationData = labeledData[trainingDataSamples:]
 
     return trainingData, validationData
-
+'''
+create model
+@param numberOfHiddenLayers
+@return model
+'''
 def create_model(numberOfHiddenLayers):
     model = keras.Sequential()
     model.add(Flatten(input_shape=imageShape))
@@ -72,6 +124,11 @@ def create_model(numberOfHiddenLayers):
 
     return model
 
+'''
+create convolutional 2D model using the sequence
+@param numberOfHiddenLayers
+@return model
+'''
 def create_conv_2D_model(numberOfHiddenLayers):
     model = keras.Sequential()
 
@@ -99,7 +156,17 @@ def create_conv_2D_model(numberOfHiddenLayers):
               metrics=['accuracy'])
 
     return model
-
+'''
+train model
+@param model
+@param trainingInputs
+@param trainingOutputs
+@param validationInputs
+@param validationOutputs
+@param epochs
+@param tensorboard
+@param modelDirectory
+'''
 def train_model(model, trainingInputs, trainingOutputs, validationInputs, validationOutputs, epochs, tensorboard, modelDirectory):
 
     model.fit(x = trainingInputs,
@@ -108,7 +175,18 @@ def train_model(model, trainingInputs, trainingOutputs, validationInputs, valida
                                  validationOutputs),
               epochs = epochs,
               callbacks = [tensorboard])
-
+'''
+create train model save model
+@param trainingInputs
+@param trainingOutputs
+@param validationInputs
+@param validationOutputs
+@param epochs
+@param tensorboard
+@param numberOfHiddenLayers
+@param modelDirectory
+@param C2D
+'''
 def create_train_save_model(trainingInputs, trainingOutputs, validationInputs, validationOutputs, epochs, modelDirectory, numberOfHiddenLayers, C2D):
     if C2D:
         model = create_conv_2D_model(numberOfHiddenLayers)
@@ -134,7 +212,17 @@ def create_train_save_model(trainingInputs, trainingOutputs, validationInputs, v
         model.save(join(modelDirectory, name))
     except:
         print(":(")
-
+'''
+run multiple models
+@param numberOfFilesInSample
+@param faceBase
+@param nonFaceBase
+@param trainSplit
+@param rangeOfNumberOfHiddenLayers
+@param epochs
+@param RGB
+@param C2D
+'''
 def run_multiple_models(numberOfFilesInSample, faceBase, nonFaceBase, trainSplit, rangeOfNumberOfHiddenLayers, epochs, RGB, C2D):
     trainingData, validationData = get_train_validation_data(numberOfFilesInSample, faceBase, nonFaceBase, trainSplit, RGB)
 
